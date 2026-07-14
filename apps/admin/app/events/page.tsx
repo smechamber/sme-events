@@ -36,7 +36,7 @@ export default async function AdminEventsPage() {
               <tr key={event.id}>
                 <td>{event.name}</td>
                 <td>{event.status}</td>
-                <td>{new Date(event.startDate).toLocaleDateString("en-IN")}</td>
+                <td>{event.startDate ? new Date(event.startDate).toLocaleDateString("en-IN") : "—"}</td>
                 <td>{event.location}</td>
                 <td>{event.tickets.length}</td>
                 <td>

@@ -7,48 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum EventStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-  SOLD_OUT
-}
-
 model Event {
-  id               String      @id @default(cuid())
-  slug             String      @unique
-  name             String
-  category         String
-  status           EventStatus @default(DRAFT)
-  shortDescription String
-  startDate        DateTime
-  endDate          DateTime?
-  time             String
-  location         String
-  heroImage        String?
-  heroVideo        String?
-  gallery          Json?
-  overview         Json?
-  mediaKit         Json?
-  agenda           Json?
-  speakers         Json?
-  sponsors         Json?
-  venue            Json?
-  contactUs        Json?
-  info             Json?
-  book             Json?
-  seoTitle         String
-  seoDescription   String
-  canonicalUrl     String
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-  tickets          EventTicket[]
-  bookings         EventBooking[]
+  id            Int           @id @default(autoincrement())
+  name          String
+  type          String
+  startDate     DateTime?
+  endDate       DateTime?
+  startTime     String?
+  endTime       String?
+  location      String
+  image         String
+  galleryImages Json?
+  galleryVideos Json?
+  status        String
+  agenda        Json?
+  book          Json?
+  contactUs     Json?
+  info          Json?
+  mediaKit      Json?
+  overview      Json?
+  speakers      Json?
+  sponsors      Json?
+  venue         Json?
+  guestPrice    Int           @default(0)
+  memberPrice   Int           @default(0)
+  EventBooking  EventBooking[]
+  tickets       EventTicket[]
 }
 
 model EventTicket {
   id          String @id @default(cuid())
-  eventId     String
+  eventId     Int
   name        String
   price       Int
   description String
@@ -61,7 +50,7 @@ model EventTicket {
 
 model EventBooking {
   id           String       @id @default(cuid())
-  eventId      String
+  eventId      Int
   ticketId     String?
   attendeeName String
   email        String

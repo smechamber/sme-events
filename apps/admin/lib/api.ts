@@ -1,4 +1,4 @@
-import type { EventBooking, EventSections, PlatformEvent, TicketTier } from "@events/types";
+import type { EventBooking, EventSections, TicketTier } from "@events/types";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002/api";
 
@@ -19,38 +19,45 @@ export async function apiGet<T>(path: string, fallback: T): Promise<T> {
 }
 
 export async function listAdminEvents() {
-  return apiGet<PlatformEvent[]>("/events?admin=true", []);
+  return apiGet<AdminEvent[]>("/events", []);
 }
 
 export async function getAdminEvent(id: string) {
-  return apiGet<PlatformEvent | null>(`/events/${id}`, null);
+  return apiGet<AdminEvent | null>(`/events/${id}`, null);
 }
 
 export async function listBookings() {
-  return apiGet<Array<EventBooking & { event?: PlatformEvent; ticket?: TicketTier }>>("/admin/event-bookings", []);
+  return apiGet<Array<EventBooking & { event?: AdminEvent; ticket?: TicketTier }>>("/admin/event-bookings", []);
 }
 
-export type EventFormPayload = {
-  slug: string;
+export type AdminEvent = {
+  id: number;
   name: string;
-  category: string;
-  status: "DRAFT" | "PUBLISHED" | "ARCHIVED" | "SOLD_OUT";
-  shortDescription: string;
-  startDate: string;
+  type: string;
+  startDate?: string;
   endDate?: string;
-  time: string;
+  startTime?: string;
+  endTime?: string;
   location: string;
-  heroImage?: string;
-  heroVideo?: string;
-  gallery: string[];
-  sections: EventSections;
+  image: string;
+  galleryImages: string[];
+  galleryVideos: string[];
+  status: string;
+  agenda?: EventSections["agenda"];
+  book?: EventSections["book"];
+  contactUs?: EventSections["contactUs"];
+  info?: EventSections["info"];
+  mediaKit?: EventSections["mediaKit"];
+  overview?: EventSections["overview"];
+  speakers?: EventSections["speakers"];
+  sponsors?: EventSections["sponsors"];
+  venue?: EventSections["venue"];
+  guestPrice: number;
+  memberPrice: number;
   tickets: TicketTier[];
-  seo: {
-    title: string;
-    description: string;
-    canonical: string;
-  };
 };
+
+export type EventFormPayload = Omit<AdminEvent, "id">;
 
 export async function saveEvent(payload: EventFormPayload, id?: string) {
   const response = await fetch(`${apiBaseUrl}/events${id ? `/${id}` : ""}`, {

@@ -48,10 +48,10 @@ export default async function HomePage() {
     startDate: featured.startDate,
     location: {
       "@type": "Place",
-      name: featured.sections.venue?.name ?? featured.location,
+     name: featured.venue?.name ?? featured.location,
       address: featured.location
     },
-    image: featured.heroImage,
+    image: featured.image,
     description: featured.shortDescription
   };
 
@@ -60,12 +60,12 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <Hero event={featured} />
 
-      <section className="section" id="featured">
+      <section className="section" id="upcoming">
         <div className="site-shell">
           <SectionHeading
-            eyebrow="Featured Events"
-            title="Flagship experiences built for decision makers."
-            copy="Curated summits, forums, and retreats with premium programming, strong attendee quality, and a polished booking experience."
+            eyebrow="Upcoming Events"
+            title="Upcoming Events"
+            copy="Discover business summits, leadership forums, and conversations that matter."
           />
           <div className="event-grid">
             {allEvents.map((event) => (
@@ -75,12 +75,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section alt" id="upcoming">
+      <section className="section alt" id="past-events">
         <div className="site-shell">
           <SectionHeading
-            eyebrow="Upcoming Events"
-            title="Plan the next high-value room."
-            copy="Every card carries the essential registration signals attendees need: category, date, time, location, status, and a clear action."
+            eyebrow="Past Events"
+            title="More events, more ideas."
+            copy="Explore our events calendar and find the right room for your next big conversation."
           />
           <div className="event-grid">
             {upcoming.map((event) => (
@@ -109,7 +109,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section alt" id="why-attend">
+      <section className="section alt" id="about">
         <div className="site-shell">
           <SectionHeading
             eyebrow="Why Attend"
@@ -136,7 +136,7 @@ export default async function HomePage() {
             copy="Only render speaker sections when speaker data exists on an event detail page; the homepage highlights marquee speakers from the featured event."
           />
           <div className="speaker-grid">
-            {(featured.sections.speakers ?? []).map((speaker) => (
+            {(featured.speakers ?? []).map((speaker) => (
               <article className="speaker-card" key={speaker.name}>
                 <Image src={speaker.image} alt={speaker.name} width={96} height={96} />
                 <h3>{speaker.name}</h3>
@@ -149,15 +149,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section alt">
+      <section className="section alt" id="partners">
         <div className="site-shell">
           <SectionHeading
             eyebrow="Sponsors"
-            title="Partner-ready presentation."
-            copy="Sponsor visibility is clean, professional, and consistent with a platform expected to serve several company websites."
+            title="Sponsors and Partners"
+            copy="Our partners help create bigger conversations and stronger communities."
           />
           <div className="sponsor-grid">
-            {(featured.sections.sponsors ?? []).map((sponsor) => (
+           {(featured.sponsors ?? []).map((sponsor) => (
               <span key={sponsor.name}>{sponsor.name}</span>
             ))}
           </div>
@@ -172,7 +172,7 @@ export default async function HomePage() {
             copy="Optimized Next.js images keep the experience fast while making the platform feel media-rich and credible."
           />
           <div className="gallery-grid">
-            {(featured.gallery ?? []).map((image) => (
+            {(featured.galleryImages ?? []).map((image) => (
               <Image key={image} src={image} alt="" width={900} height={620} loading="lazy" />
             ))}
           </div>

@@ -1,83 +1,78 @@
 import { prisma } from "@events/db";
-import type { Prisma } from "@prisma/client";
 import { mapEvent } from "../../../../lib/event-mapper";
 import { eventPayloadSchema } from "../../../../lib/event-schema";
 import { fail, ok } from "../../../../lib/http";
 
-export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server";
 
-type Params = {
-  params: Promise<{ id: string }>;
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "http://localhost:3001",
+  "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-function jsonValue(value: unknown): Prisma.InputJsonValue | undefined {
-  return value === null || value === undefined ? undefined : (value as Prisma.InputJsonValue);
-}
-
-async function findEvent(id: string) {
-  return prisma.event.findFirst({
-    where: {
-      OR: [{ id }, { slug: id }]
-    },
-    include: { tickets: true }
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
   });
 }
 
-export async function GET(_: Request, { params }: Params) {
+export const dynamic = "force-dynamic";
+const json = (value: unknown) =>
+  value === null || value === undefined ? undefined : (value as never);
+async function findEvent(id: number) {
+  return prisma.event.findUnique({ where: { id }, include: { tickets: true } });
+}
+export async function GET(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
-    const { id } = await params;
-    const event = await findEvent(id);
-
-    if (!event) {
-      return fail(new Error("EVENT_NOT_FOUND"), 404);
-    }
-
-    return ok(mapEvent(event));
+    const event = await findEvent(Number((await params).id));
+    return event
+      ? ok(mapEvent(event))
+      : fail(new Error("EVENT_NOT_FOUND"), 404);
   } catch (error) {
     return fail(error);
   }
 }
-
-export async function PUT(request: Request, { params }: Params) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
-    const { id } = await params;
-    const existing = await findEvent(id);
-
-    if (!existing) {
-      return fail(new Error("EVENT_NOT_FOUND"), 404);
-    }
-
+    console.log("PUT START");
+    const id = Number((await params).id);
+    if (!(await findEvent(id))) return fail(new Error("EVENT_NOT_FOUND"), 404);
     const payload = eventPayloadSchema.parse(await request.json());
-
-    await prisma.eventTicket.deleteMany({ where: { eventId: existing.id } });
-
+        console.log(payload);
+    await prisma.eventTicket.deleteMany({ where: { eventId: id } });
     const event = await prisma.event.update({
-      where: { id: existing.id },
+      where: { id },
       data: {
-        slug: payload.slug,
         name: payload.name,
-        category: payload.category,
-        status: payload.status,
-        shortDescription: payload.shortDescription,
+        type: payload.type,
         startDate: payload.startDate,
         endDate: payload.endDate,
-        time: payload.time,
+        startTime: payload.startTime,
+        endTime: payload.endTime,
         location: payload.location,
-        heroImage: payload.heroImage,
-        heroVideo: payload.heroVideo,
-        gallery: jsonValue(payload.gallery),
-        overview: jsonValue(payload.sections.overview),
-        mediaKit: jsonValue(payload.sections.mediaKit),
-        agenda: jsonValue(payload.sections.agenda),
-        speakers: jsonValue(payload.sections.speakers),
-        sponsors: jsonValue(payload.sections.sponsors),
-        venue: jsonValue(payload.sections.venue),
-        contactUs: jsonValue(payload.sections.contactUs),
-        info: jsonValue(payload.sections.info),
-        book: jsonValue(payload.sections.book),
-        seoTitle: payload.seo.title,
-        seoDescription: payload.seo.description,
-        canonicalUrl: payload.seo.canonical,
+        image: payload.image,
+        galleryImages: json(payload.galleryImages),
+        galleryVideos: json(payload.galleryVideos),
+        status: payload.status,
+        agenda: json(payload.agenda),
+        book: json(payload.book),
+        contactUs: json(payload.contactUs),
+        info: json(payload.info),
+        mediaKit: json(payload.mediaKit),
+        overview: json(payload.overview),
+        speakers: json(payload.speakers),
+        sponsors: json(payload.sponsors),
+        venue: json(payload.venue),
+        guestPrice: payload.guestPrice,
+        memberPrice: payload.memberPrice,
         tickets: {
           create: payload.tickets.map((ticket) => ({
             name: ticket.name,
@@ -85,29 +80,25 @@ export async function PUT(request: Request, { params }: Params) {
             description: ticket.description,
             quantity: ticket.quantity,
             sold: ticket.sold ?? 0,
-            isFree: ticket.isFree ?? ticket.price === 0
-          }))
-        }
+            isFree: ticket.isFree ?? ticket.price === 0,
+          })),
+        },
       },
-      include: { tickets: true }
+      include: { tickets: true },
     });
-
     return ok(mapEvent(event));
   } catch (error) {
+     console.error("PUT ERROR:", error);
     return fail(error);
   }
 }
-
-export async function DELETE(_: Request, { params }: Params) {
+export async function DELETE(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
-    const { id } = await params;
-    const existing = await findEvent(id);
-
-    if (!existing) {
-      return fail(new Error("EVENT_NOT_FOUND"), 404);
-    }
-
-    await prisma.event.delete({ where: { id: existing.id } });
+    const id = Number((await params).id);
+    await prisma.event.delete({ where: { id } });
     return ok({ deleted: true });
   } catch (error) {
     return fail(error);

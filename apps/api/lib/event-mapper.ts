@@ -1,31 +1,27 @@
-import type { PlatformEvent } from "@events/types";
-
 type DbEvent = {
-  id: string;
-  slug: string;
+  id: number;
   name: string;
-  category: string;
-  status: "DRAFT" | "PUBLISHED" | "ARCHIVED" | "SOLD_OUT";
-  shortDescription: string;
-  startDate: Date;
+  type: string;
+  startDate: Date | null;
   endDate: Date | null;
-  time: string;
+  startTime: string | null;
+  endTime: string | null;
   location: string;
-  heroImage: string | null;
-  heroVideo: string | null;
-  gallery: unknown;
-  overview: unknown;
-  mediaKit: unknown;
+  image: string;
+  galleryImages: unknown;
+  galleryVideos: unknown;
+  status: string;
   agenda: unknown;
+  book: unknown;
+  contactUs: unknown;
+  info: unknown;
+  mediaKit: unknown;
+  overview: unknown;
   speakers: unknown;
   sponsors: unknown;
   venue: unknown;
-  contactUs: unknown;
-  info: unknown;
-  book: unknown;
-  seoTitle: string;
-  seoDescription: string;
-  canonicalUrl: string;
+  guestPrice: number;
+  memberPrice: number;
   tickets?: Array<{
     id: string;
     name: string;
@@ -36,46 +32,40 @@ type DbEvent = {
     isFree: boolean;
   }>;
 };
+const array = <T>(value: unknown): T[] =>
+  Array.isArray(value) ? (value as T[]) : [];
+const object = <T extends Record<string, unknown>>(
+  value: unknown,
+): T | undefined =>
+  value && typeof value === "object" && !Array.isArray(value)
+    ? (value as T)
+    : undefined;
 
-function asArray<T>(value: unknown): T[] {
-  return Array.isArray(value) ? (value as T[]) : [];
-}
-
-function asObject<T extends Record<string, unknown>>(value: unknown): T | undefined {
-  return value && typeof value === "object" && !Array.isArray(value) ? (value as T) : undefined;
-}
-
-export function mapEvent(event: DbEvent): PlatformEvent {
+export function mapEvent(event: DbEvent) {
   return {
     id: event.id,
-    slug: event.slug,
     name: event.name,
-    category: event.category,
-    status: event.status,
-    shortDescription: event.shortDescription,
-    startDate: event.startDate.toISOString(),
+    type: event.type,
+    startDate: event.startDate?.toISOString(),
     endDate: event.endDate?.toISOString(),
-    time: event.time,
+    startTime: event.startTime ?? undefined,
+    endTime: event.endTime ?? undefined,
     location: event.location,
-    heroImage: event.heroImage ?? undefined,
-    heroVideo: event.heroVideo ?? undefined,
-    gallery: asArray<string>(event.gallery),
-    sections: {
-      overview: asObject(event.overview),
-      mediaKit: asObject(event.mediaKit),
-      agenda: asArray(event.agenda),
-      speakers: asArray(event.speakers),
-      sponsors: asArray(event.sponsors),
-      venue: asObject(event.venue),
-      contactUs: asObject(event.contactUs),
-      info: asArray<string>(event.info),
-      book: asObject(event.book)
-    },
+    image: event.image,
+    galleryImages: array<string>(event.galleryImages),
+    galleryVideos: array<string>(event.galleryVideos),
+    status: event.status,
+    agenda: array(event.agenda),
+    book: object(event.book),
+    contactUs: object(event.contactUs),
+    info: array<string>(event.info),
+    mediaKit: object(event.mediaKit),
+    overview: object(event.overview),
+    speakers: array(event.speakers),
+    sponsors: array(event.sponsors),
+    venue: object(event.venue),
+    guestPrice: event.guestPrice,
+    memberPrice: event.memberPrice,
     tickets: event.tickets ?? [],
-    seo: {
-      title: event.seoTitle,
-      description: event.seoDescription,
-      canonical: event.canonicalUrl
-    }
   };
 }

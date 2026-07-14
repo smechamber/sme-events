@@ -5,81 +5,80 @@ const fallbackImage =
 
 export const demoEvents: PlatformEvent[] = [
   {
-    id: "demo-global-growth-summit",
-    slug: "global-growth-summit-2026",
+    id: 1,
     name: "Global Growth Summit 2026",
-    category: "Leadership",
+    type: "Leadership", // Replaced 'category'
     status: "PUBLISHED",
-    shortDescription: "A flagship leadership forum for enterprise growth, capital, policy, and global partnerships.",
     startDate: "2026-09-18T00:00:00.000Z",
-    time: "09:00 AM - 06:30 PM",
+    startTime: "09:00", // Extracted from 'time'
+    endTime: "18:30",
     location: "Mumbai, India",
-    heroImage: fallbackImage,
-    gallery: [
+    image: fallbackImage, // Replaced 'heroImage'
+    galleryImages: [      // Replaced 'gallery'
       "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80",
       "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80"
     ],
-    sections: {
-      overview: {
-        heading: "A premium room for business leaders.",
-        content:
-          "A gathering of founders, CXOs, investors, public leaders, and ecosystem builders shaping the next decade of business growth."
-      },
-      mediaKit: {
-        title: "Media Kit",
-        description: "Press releases, speaker portraits, brand assets, and venue media are available for approved partners.",
-        files: [{ label: "Download Media Kit", url: "#" }]
-      },
-      agenda: [
-        {
-          time: "09:00",
-          title: "Executive Registration",
-          description: "Badge pickup, hosted networking breakfast, and partner lounge access."
-        },
-        {
-          time: "10:00",
-          title: "Opening Keynote",
-          description: "The enterprise growth playbook for resilient global expansion."
-        }
-      ],
-      speakers: [
-        {
-          name: "Aarav Mehta",
-          role: "Managing Partner",
-          company: "Northstar Ventures",
-          image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80"
-        },
-        {
-          name: "Naina Kapoor",
-          role: "Chief Strategy Officer",
-          company: "Atlas Group",
-          image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80"
-        }
-      ],
-      sponsors: [{ name: "Atlas" }, { name: "Northstar" }, { name: "FinEdge" }],
-      venue: {
-        name: "Jio World Convention Centre",
-        address: "Mumbai, India",
-        notes: "Doors open at 8:30 AM."
-      },
-      contactUs: {
-        email: "events@company.com",
-        phone: "+91 22 4000 2026",
-        person: "Events Desk"
-      },
-      info: ["Government ID is required at check-in.", "Smart casual attire."],
-      book: { enabled: true, instructions: "Select a ticket and continue to checkout." }
+    galleryVideos: [],
+    
+    // Flattened sections
+    overview: {
+      heading: "A premium room for business leaders.",
+      content:
+        "A gathering of founders, CXOs, investors, public leaders, and ecosystem builders shaping the next decade of business growth."
     },
-    tickets: [
-      { id: "demo-ticket-1", name: "Delegate Pass", price: 14900, description: "Main stage, expo, lunch, and networking.", quantity: 120 },
-      { id: "demo-ticket-2", name: "Executive Pass", price: 29900, description: "Delegate access plus VIP lounge and dinner.", quantity: 42 }
+    mediaKit: {
+      title: "Media Kit",
+      description: "Press releases, speaker portraits, brand assets, and venue media are available for approved partners.",
+      files: [{ label: "Download Media Kit", url: "#" }],
+      videos: []
+    },
+    agenda: [
+      {
+        time: "09:00",
+        title: "Executive Registration",
+        description: "Badge pickup, hosted networking breakfast, and partner lounge access."
+      },
+      {
+        time: "10:00",
+        title: "Opening Keynote",
+        description: "The enterprise growth playbook for resilient global expansion."
+      }
     ],
-    seo: {
-      title: "Global Growth Summit 2026",
-      description: "Book your pass for Global Growth Summit 2026 in Mumbai.",
-      canonical: "/events/global-growth-summit-2026"
-    }
+    speakers: [
+      {
+        name: "Aarav Mehta",
+        role: "Managing Partner",
+        company: "Northstar Ventures",
+        image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80"
+      },
+      {
+        name: "Naina Kapoor",
+        role: "Chief Strategy Officer",
+        company: "Atlas Group",
+        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80"
+      }
+    ],
+    sponsors: [{ name: "Atlas" }, { name: "Northstar" }, { name: "FinEdge" }],
+    venue: {
+      name: "Jio World Convention Centre",
+      address: "Mumbai, India",
+      notes: "Doors open at 8:30 AM."
+    },
+    contactUs: {
+      email: "events@company.com",
+      phone: "+91 22 4000 2026",
+      person: "Events Desk"
+    },
+    info: ["Government ID is required at check-in.", "Smart casual attire."],
+    book: { enabled: true, instructions: "Select a ticket and continue to checkout." },
+    
+    guestPrice: 14900,
+    memberPrice: 12000,
+    tickets: [
+      { id: 1, eventId: 1, name: "Delegate Pass", price: 14900, description: "Main stage, expo, lunch, and networking.", quantity: 120, sold: 0 },
+      { id: 2, eventId: 1, name: "Executive Pass", price: 29900, description: "Delegate access plus VIP lounge and dinner.", quantity: 42, sold: 0 }
+    ]
   }
 ];
 
@@ -106,9 +105,10 @@ export async function listEvents(admin = false) {
   return apiFetch<PlatformEvent[]>(`/events${admin ? "?admin=true" : ""}`, demoEvents);
 }
 
-export async function getEventBySlug(slug: string) {
-  const fallback = demoEvents.find((event) => event.slug === slug) ?? null;
-  return apiFetch<PlatformEvent | null>(`/events/${slug}`, fallback);
+// Updated from getEventBySlug to getEventById
+export async function getEventById(id: number) {
+  const fallback = demoEvents.find((event) => event.id === id) ?? null;
+  return apiFetch<PlatformEvent | null>(`/events/${id}`, fallback);
 }
 
 export async function getFeaturedEvent() {
@@ -123,8 +123,7 @@ export async function getUpcomingEvents() {
 export async function getPastEvents() {
   return demoEvents.map((event) => ({
     ...event,
-    id: "demo-past-enterprise",
-    slug: "enterprise-leadership-retreat-2025",
+    id: event.id + 1000, // Assigning a unique numeric ID for the past event dummy data
     name: "Enterprise Leadership Retreat 2025",
     status: "ARCHIVED" as const,
     startDate: "2025-12-09T00:00:00.000Z"

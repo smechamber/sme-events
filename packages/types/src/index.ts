@@ -31,70 +31,100 @@ export type TicketTier = {
   isFree?: boolean;
 };
 
-export type EventSections = {
-  overview?: {
-    heading?: string;
-    content?: string;
-  };
-  mediaKit?: {
-    title?: string;
-    description?: string;
-    files?: Array<{ label: string; url: string }>;
-  };
-  agenda?: AgendaItem[];
-  speakers?: Speaker[];
-  sponsors?: Array<{ name: string; logo?: string; website?: string }>;
-  venue?: {
-    name?: string;
-    address?: string;
-    mapUrl?: string;
-    notes?: string;
-  };
-  contactUs?: {
-    email?: string;
-    phone?: string;
-    person?: string;
-  };
-  info?: string[];
-  book?: {
-    enabled?: boolean;
-    instructions?: string;
-  };
+export type MediaKit = {
+  title?: string;
+  description?: string;
+  files?: Array<{
+    label: string;
+    url: string;
+  }>;
+  videos?: string[];
+};
+
+export type Venue = {
+  name?: string;
+  address?: string;
+  mapUrl?: string;
+  notes?: string;
+};
+
+export type ContactUs = {
+  email?: string;
+  phone?: string;
+  person?: string;
+};
+
+export type Book = {
+  enabled?: boolean;
+  instructions?: string;
+};
+
+export type Overview = {
+  heading?: string;
+  content?: string;
+};
+
+export type Sponsor = {
+  name: string;
+  logo?: string;
+  website?: string;
 };
 
 export type PlatformEvent = {
-  id: string;
-  slug: string;
+  id: number;
   name: string;
-  category: EventCategory | string;
-  status: EventStatus;
-  shortDescription: string;
-  startDate: string;
+  type: string;
+
+  startDate?: string;
   endDate?: string;
-  time: string;
+
+  startTime?: string;
+  endTime?: string;
+
   location: string;
-  heroImage?: string;
-  heroVideo?: string;
-  gallery?: string[];
-  sections: EventSections;
+
+  image: string;
+  galleryImages: string[];
+  galleryVideos: string[];
+
+  status: EventStatus | string;
+
+  overview?: Overview;
+  mediaKit?: MediaKit;
+  agenda: AgendaItem[];
+  speakers: Speaker[];
+  sponsors: Sponsor[];
+  venue?: Venue;
+  contactUs?: ContactUs;
+  info: string[];
+  book?: Book;
+
+  guestPrice: number;
+  memberPrice: number;
+
   tickets: TicketTier[];
-  seo: {
-    title: string;
-    description: string;
-    canonical: string;
-  };
 };
 
 export type EventBooking = {
   id: string;
-  eventId: string;
+  eventId: number;
   ticketId?: string;
+
   attendeeName: string;
   email: string;
   phone?: string;
+
   quantity: number;
   amount: number;
-  status: "PENDING" | "PAID" | "FAILED" | "FREE" | "CANCELLED";
+
   paymentId?: string;
+
+  status:
+    | "PENDING"
+    | "PAID"
+    | "FAILED"
+    | "FREE"
+    | "CANCELLED";
+
   createdAt: string;
 };

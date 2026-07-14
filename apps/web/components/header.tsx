@@ -1,51 +1,51 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDays, Menu, Search, UserRound, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Menu, Search, X } from "lucide-react";
+import { useState } from "react";
 
 const links = [
+  ["Home", "/"],
   ["Upcoming Events", "/#upcoming"],
-  ["Categories", "/#categories"],
-  ["About", "/#why-attend"],
-  ["Contact", "/#contact"],
-  ["My Bookings", "/book/global-growth-summit-2026"]
+  ["Past Events", "/#past-events"],
+  ["Partner with us", "/#partners"],
+  ["About us", "/#about"],
 ];
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [compact, setCompact] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setCompact(window.scrollY > 36);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
-    <header className="header" style={{ background: compact ? "rgba(11, 18, 32, 0.88)" : undefined }}>
-      <div className="site-shell">
-        <div className="header-inner" style={{ minHeight: compact ? 64 : undefined }}>
-          <Link href="/" className="brand" aria-label="Master Events Platform home">
-            <span className="brand-mark">
-              <CalendarDays size={19} aria-hidden />
-            </span>
-            <span>Master Events</span>
+    <header className="header">
+      <div className="utility-bar">
+        <div className="site-shell">
+          <span>SME EVENTS</span>
+          <span className="utility-links">
+            LinkedIn &nbsp; X &nbsp; Instagram
+          </span>
+        </div>
+      </div>
+      <div className="main-nav">
+        <div className="site-shell header-inner">
+          <Link href="/" className="brand" aria-label="SME Events home">
+            <span>SME</span>
+            <small>EVENTS</small>
           </Link>
-          <div className="search-pill" aria-label="Search events">
-            <Search size={16} aria-hidden />
-            <span>Search events</span>
-          </div>
           <nav className="desktop-nav" aria-label="Primary navigation">
             {links.map(([label, href]) => (
               <Link key={href} href={href}>
                 {label}
               </Link>
             ))}
-            <Link className="btn btn-ghost" href="/#featured">
-              <UserRound size={16} aria-hidden />
-              Login
+            <Link className="nav-calendar" href="/#upcoming">
+              Events Calendar
+            </Link>
+            <Link
+              className="nav-search"
+              href="/#upcoming"
+              aria-label="Search events"
+            >
+              <Search size={20} />
             </Link>
           </nav>
           <button
@@ -53,20 +53,20 @@ export function Header() {
             type="button"
             aria-label="Open menu"
             aria-expanded={open}
-            onClick={() => setOpen((value) => !value)}
+            onClick={() => setOpen(!open)}
           >
             {open ? <X /> : <Menu />}
           </button>
         </div>
-        <nav className={`mobile-drawer ${open ? "open" : ""}`} aria-label="Mobile navigation">
+        <nav
+          className={`mobile-drawer ${open ? "open" : ""}`}
+          aria-label="Mobile navigation"
+        >
           {links.map(([label, href]) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}>
               {label}
             </Link>
           ))}
-          <Link href="/#featured" onClick={() => setOpen(false)}>
-            Login / Profile
-          </Link>
         </nav>
       </div>
     </header>

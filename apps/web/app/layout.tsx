@@ -6,21 +6,21 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://events.company.com"),
   title: {
-    default: "Master Events Platform",
-    template: "%s | Master Events Platform"
+    default: "SME Events",
+    template: "%s | SME Events"
   },
-  description: "Premium enterprise event platform for conferences, summits, forums, and business gatherings.",
+  description: "Discover India's most relevant business events, summits, forums, and conversations.",
   openGraph: {
-    title: "Master Events Platform",
+    title: "SME Events",
     description: "Discover, book, and attend world-class business events.",
     url: "https://events.company.com",
-    siteName: "Master Events Platform",
+    siteName: "SME Events",
     images: ["/og-image.jpg"],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Master Events Platform",
+    title: "SME Events",
     description: "Discover, book, and attend world-class business events."
   },
   alternates: {
