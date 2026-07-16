@@ -1,5 +1,17 @@
-import { CloudinaryUpload } from "./cloudinary-upload";
+import { MediaUpload } from "./media-upload";
 
-export default function DocumentUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
-  return <CloudinaryUpload value={value} onChange={onChange} kind="raw" />;
+export default function DocumentUpload({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  return (
+    <MediaUpload
+      value={value}
+      onChange={onChange}
+      kind="document"
+    />
+  );
 }

@@ -1,5 +1,17 @@
-import { CloudinaryUpload } from "./cloudinary-upload";
+import { MediaUpload } from "./media-upload";
 
-export default function MultiImageUpload({ value, onChange }: { value?: string[]; onChange: (urls: string[]) => void }) {
-  return <CloudinaryUpload values={value ?? []} onChangeMany={onChange} kind="image" />;
+export default function MultiImageUpload({
+  value,
+  onChange,
+}: {
+  value?: string[];
+  onChange: (urls: string[]) => void;
+}) {
+  return (
+    <MediaUpload
+      values={value ?? []}
+      onChangeMany={onChange}
+      kind="image"
+    />
+  );
 }
