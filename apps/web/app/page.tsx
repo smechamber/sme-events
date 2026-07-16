@@ -63,7 +63,7 @@ export default async function HomePage() {
       <Hero events={allEvents} />
 
       {/* Upcoming Events */}
-      <section className="py-20 lg:py-28" id="upcoming">
+      <section className="py-20" id="upcoming">
         <div className="max-w-[1630px] mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             eyebrow="Upcoming Events"

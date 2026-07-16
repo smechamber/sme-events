@@ -98,12 +98,16 @@ export function Hero({
     return null;
   }
 
+  
+
   return (
-    <section
-      className={`relative w-full overflow-hidden bg-[#111] ${
-        detail ? "h-[40vh] min-h-[400px]" : "h-[60vh] min-h-[650px]"
-      }`}
-    >
+  <section
+  className={`relative w-full overflow-hidden bg-[#111] ${
+    detail
+      ? "h-[25vh] min-h-[250px] md:h-[40vh] md:min-h-[400px]"
+      : "h-[40vh] min-h-[500px] md:h-[60vh] md:min-h-[650px]"
+  }`}
+>
       {/* Sliding Track */}
       <div
         className="flex w-full h-full transition-transform duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
@@ -112,6 +116,16 @@ export function Hero({
         {displayEvents.map((ev, index) => {
           const image = ev.image || FALLBACK_IMAGE;
 
+const description = (
+  ev.overview?.content ??
+  ev.overview?.heading ??
+  ""
+)
+  .replace(/<[^>]*>/g, "")   // HTML tags remove
+  .replace(/&nbsp;/g, " ")   // &nbsp; ko space banao
+  .replace(/&amp;/g, "&")    // optional
+  .replace(/\s+/g, " ")      // extra spaces remove
+  .trim();
           return (
             <div key={ev.id} className="min-w-full h-full relative">
               
@@ -126,68 +140,91 @@ export function Hero({
               />
 
               {/* Dark Gradient Overlay (Left se dark, right me transparent) */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50 pointer-events-none" />
 
               {/* Content Box Container */}
-              <div className="max-w-[1630px] mx-auto px-4 sm:px-6 lg:px-8 h-full relative z-10">
-                
-                {/* Left Aligned Content */}
-                <div className="absolute top-1/2 -translate-y-1/2 max-w-2xl flex flex-col gap-5 text-white mt-8">
-                  
-                  {/* Small Event Label */}
-                  <span className="bg-[#e31837] text-white px-3 py-1 rounded text-xs font-bold uppercase tracking-widest w-fit shadow-lg">
-                    {ev.type ?? "SME EVENT"}
-                  </span>
+           <div className="max-w-[1630px] mx-auto px-5 sm:px-6 lg:px-8 h-full relative z-10">
+  <div
+    className="
+      absolute
+      left-5
+      right-5
+      top-1/2
+      -translate-y-1/2
+      md:left-0
+      md:right-auto
+      max-w-2xl
+      flex
+      flex-col
+      gap-2 
+      md:gap-5
+      text-white
+    "
+  >
+    {/* Badge */}
+    <span className="bg-[#e31837] text-white px-2 py-1 rounded-sm text-[10px] md:text-xs font-bold uppercase tracking-widest w-fit">
+      {ev.type ?? "SME EVENT"}
+    </span>
 
-                  {/* Title */}
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] drop-shadow-md">
-                    {ev.name}
-                  </h1>
+    {/* Title */}
+    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-snug md:leading-tight">
+      {ev.name}
+    </h1>
 
-                  {/* Metadata (Date, Time, Location) */}
-                  <div className="flex flex-wrap gap-6 items-center text-white/90 font-medium text-[17px]">
-                    {ev.startDate && (
-                      <div className="flex items-center gap-2">
-                        <Calendar size={18} />
-                        <span>
-                          {new Date(ev.startDate).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                        </span>
-                      </div>
-                    )}
+    {/* Meta Info (Date, Time, Location) */}
+   {/* Meta Info Container - Flex Col (Taki Location neeche aaye) */}
+<div className="flex flex-col gap-1.5 md:gap-2 text-xs sm:text-sm md:text-base text-white/90">
+  
+  {/* Row 1: Date aur Time */}
+  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+    {ev.startDate && (
+      <div className="flex items-center gap-1.5">
+        <Calendar size={14} className="md:w-5 md:h-5" />
+        <span>
+          {new Date(ev.startDate).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </span>
+      </div>
+    )}
 
-                    {ev.startTime && (
-                      <div className="flex items-center gap-2">
-                        <Clock size={18} />
-                        <span>{ev.startTime}</span>
-                      </div>
-                    )}
+    {ev.startTime && (
+      <div className="flex items-center gap-1.5">
+        <Clock size={14} className="md:w-5 md:h-5" />
+        <span>{ev.startTime}</span>
+      </div>
+    )}
+  </div>
 
-                    <div className="flex items-center gap-2">
-                      <MapPin size={18} />
-                      <span>{ev.location}</span>
-                    </div>
-                  </div>
+  {/* Row 2: Location (Hamesha ek nayi line par) */}
+  {ev.location && (
+    <div className="flex items-start md:items-center gap-1.5">
+      <MapPin size={14} className="md:w-5 md:h-5 shrink-0 mt-0.5 md:mt-0" />
+      <span className="line-clamp-1">{ev.location}</span>
+    </div>
+  )}
+  
+</div>
 
-                  {/* Overview (Line Clamp 2 se sirf 2 lines dikhengi) */}
-                  <p className="text-lg leading-relaxed text-white/85 line-clamp-2">
-                    {ev.overview?.content ?? ev.overview?.heading ?? ""}
-                  </p>
+    {/* Description */}
+    <p className="text-xs sm:text-sm md:text-lg leading-relaxed text-white/85 line-clamp-2">
+      {description}
+    </p>
 
-                  {/* CTA Button */}
-                  <div className="mt-2">
-                    <Link
-                      href={detail ? "#book" : `/events/${ev.id}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 font-semibold bg-white text-black rounded hover:bg-gray-200 transition-colors"
-                    >
-                      {detail ? "Book Tickets" : "Know More"} <ArrowRight size={18} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
+    {/* Button */}
+    <div className="pt-1 md:pt-2">
+      <Link
+        href={detail ? "#book" : `/events/${ev.id}`}
+        className="inline-flex items-center gap-1.5 px-4 py-2 md:px-5 md:py-3 text-sm md:text-base bg-white text-black rounded-md md:rounded-lg font-semibold hover:bg-gray-200 transition"
+      >
+        {detail ? "Book Tickets" : "Know More"}
+        <ArrowRight size={16} className="md:w-5 md:h-5" />
+      </Link>
+    </div>
+  </div>
+</div>
             </div>
           );
         })}

@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const links = [
-  ["Home", "/"],
+  // ["Home", "/"],
   ["Upcoming Events", "/#upcoming"],
   ["Past Events", "/#past-events"],
   ["Partner with us", "/#partners"],
@@ -82,7 +82,7 @@ export function Header() {
       {/* Main Navbar - Scroll hone par Transparent se White hoga */}
       <div 
         className={`transition-all duration-500 ease-in-out ${
-          isScrolled ? "bg-white shadow-lg py-0" : "bg-transparent py-2"
+          isScrolled ? "bg-white shadow-lg py-0" : "bg-transparent py-0"
         }`}
       >
         {/* flex & justify-between ensures logo goes left and nav/icon goes right */}
@@ -95,7 +95,7 @@ export function Header() {
             aria-label="SME Events home"
           >
             {/* Wrapper div for Next.js Image fill to work perfectly */}
-            <div className="relative w-[130px] h-[45px] md:w-[90px] md:h-[55px]">
+            <div className="relative w-[70px] h-[45px] md:w-[90px] md:h-[55px]">
               <Image
                 src="/sme-event.png"
                 alt="SME Events Logo"
@@ -114,24 +114,24 @@ export function Header() {
                 <Link 
                   key={href} 
                   href={href}
-                  className={`text-[15px] font-medium transition-colors duration-300 whitespace-nowrap ${
+                  className={`text-[15px] font-medium transition-colors duration-300 whitespace-nowrap border-b-2 border-orange-400 ${
                     isScrolled 
                       ? "text-gray-700 hover:text-black" 
                       : "text-white hover:text-white/70 drop-shadow-md"
                   }`}
-                >
+                > 
                   {label}
                 </Link>
               ))}
             </div>
             
             {/* Events Calendar Button */}
-            <Link 
+            {/* <Link 
               className="flex items-center justify-center px-8 bg-[#e31837] text-white text-[15px] font-medium hover:bg-red-800 transition-colors whitespace-nowrap" 
               href="/#upcoming"
             >
               Events Calendar
-            </Link>
+            </Link> */}
             
             {/* Search Icon */}
             <button
@@ -149,7 +149,7 @@ export function Header() {
           {/* Mobile Toggle Button - Strictly aligned right */}
           <div className="md:hidden flex items-center">
             <button
-              className={`flex items-center justify-center p-2 rounded-md transition-colors duration-300 ${
+              className={`flex items-center justify-center  rounded-md transition-colors duration-300 ${
                 isScrolled ? "text-black hover:bg-gray-100" : "text-white hover:bg-white/10"
               }`}
               type="button"
