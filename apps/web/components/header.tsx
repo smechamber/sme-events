@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation"; // NAYA IMPORT
 import { 
   Menu, 
   Search, 
@@ -25,6 +26,15 @@ const links = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  
+  // URL check karne ke liye hook
+  const pathname = usePathname();
+  
+  // Agar URL mein "/events" aata hai, toh isEventPage true ho jayega
+  const isEventPage = pathname?.includes("/events");
+  
+  // Agar Events page hai YA user ne scroll kiya hai, toh Header White rahega
+  const forceWhite = isEventPage || isScrolled;
 
   // Scroll track karne ke liye effect
   useEffect(() => {
@@ -79,13 +89,12 @@ export function Header() {
         </div>
       </div>
 
-      {/* Main Navbar - Scroll hone par Transparent se White hoga */}
+      {/* Main Navbar - isScrolled ki jagah forceWhite use kiya hai */}
       <div 
         className={`transition-all duration-500 ease-in-out ${
-          isScrolled ? "bg-white shadow-lg py-0" : "bg-transparent py-0"
+          forceWhite ? "bg-white shadow-lg py-0" : "bg-transparent py-0"
         }`}
       >
-        {/* flex & justify-between ensures logo goes left and nav/icon goes right */}
         <div className="max-w-[1630px] mx-auto flex justify-between items-stretch h-16 md:h-20 px-4 sm:px-6 lg:px-8">
           
           {/* Brand Logo - Image */}
@@ -94,14 +103,13 @@ export function Header() {
             className="flex items-center group" 
             aria-label="SME Events home"
           >
-            {/* Wrapper div for Next.js Image fill to work perfectly */}
             <div className="relative w-[70px] h-[45px] md:w-[90px] md:h-[55px]">
               <Image
                 src="/sme-event.png"
                 alt="SME Events Logo"
                 fill
                 className="object-contain transition-transform duration-300 ease-in-out group-hover:scale-105"
-                priority // Isse logo fast load hoga
+                priority
               />
             </div>
           </Link>
@@ -114,8 +122,8 @@ export function Header() {
                 <Link 
                   key={href} 
                   href={href}
-                  className={`text-[15px] font-medium transition-colors duration-300 whitespace-nowrap border-b-2 border-orange-400 ${
-                    isScrolled 
+                  className={`text-[15px] font-medium transition-colors duration-300 whitespace-nowrap border-b-2 border-transparent hover:border-orange-400 ${
+                    forceWhite 
                       ? "text-gray-700 hover:text-black" 
                       : "text-white hover:text-white/70 drop-shadow-md"
                   }`}
@@ -125,18 +133,10 @@ export function Header() {
               ))}
             </div>
             
-            {/* Events Calendar Button */}
-            {/* <Link 
-              className="flex items-center justify-center px-8 bg-[#e31837] text-white text-[15px] font-medium hover:bg-red-800 transition-colors whitespace-nowrap" 
-              href="/#upcoming"
-            >
-              Events Calendar
-            </Link> */}
-            
             {/* Search Icon */}
             <button
               className={`flex items-center justify-center px-6 transition-colors duration-300 ${
-                isScrolled 
+                forceWhite 
                   ? "hover:bg-gray-100 bg-gray-100 text-black" 
                   : "hover:bg-white/10 bg-gray-100/20 text-white"
               }`}
@@ -146,11 +146,11 @@ export function Header() {
             </button>
           </nav>
 
-          {/* Mobile Toggle Button - Strictly aligned right */}
+          {/* Mobile Toggle Button */}
           <div className="md:hidden flex items-center">
             <button
-              className={`flex items-center justify-center  rounded-md transition-colors duration-300 ${
-                isScrolled ? "text-black hover:bg-gray-100" : "text-white hover:bg-white/10"
+              className={`flex items-center justify-center rounded-md transition-colors duration-300 ${
+                forceWhite ? "text-black hover:bg-gray-100" : "text-white hover:bg-white/10"
               }`}
               type="button"
               aria-label="Open menu"
@@ -172,14 +172,13 @@ export function Header() {
         />
       )}
       
-      {/* Mobile Drawer Menu - Slides in from RIGHT */}
+      {/* Mobile Drawer Menu */}
       <nav
         className={`fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-400 ease-out md:hidden flex flex-col pt-4 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         aria-label="Mobile navigation"
       >
-        {/* Close Button Inside Drawer (Top Right) */}
         <div className="flex justify-end px-4 mb-8">
           <button 
             onClick={() => setOpen(false)} 
@@ -190,7 +189,6 @@ export function Header() {
           </button>
         </div>
         
-        {/* Drawer Links */}
         <div className="flex flex-col px-8 gap-6">
           {links.map(([label, href]) => (
             <Link 

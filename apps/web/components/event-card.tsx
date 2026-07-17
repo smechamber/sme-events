@@ -10,35 +10,55 @@ export function EventCard({ event }: { event: PlatformEvent }) {
   const date = event.startDate ? new Date(event.startDate) : null;
 
   return (
-    <article className="event-card">
-      <Link
-        href={`/events/${event.id}`}
-        className="event-card-media"
-        aria-label={`View ${event.name}`}
-      >
-        <Image src={image} alt={event.name} fill sizes="(max-width: 700px) 100vw, 33vw" />
-      </Link>
+    // 'group' add kiya taaki hover effects baad mein use kar sako
+    <article className="event-card bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <Link
+  href={`/events/${event.id}`}
+  className="relative block aspect-video w-full overflow-hidden bg-gray-100"
+  aria-label={`View ${event.name}`}
+>
+  {/* 1. Blur Background Layer (Side ki jagah bharne ke liye) */}
+  <Image 
+    src={image} 
+    alt="" 
+    fill 
+    className="absolute inset-0 object-cover blur-md scale-110 opacity-60" 
+    sizes="(max-width: 768px) 100vw, 33vw"
+  />
 
-      <div className="event-card-body">
-        <p className="event-label">SME EVENTS</p>
+  {/* 2. Main Image (Contain mode mein, taaki puri dikhe) */}
+  <Image 
+    src={image} 
+    alt={event.name} 
+    fill 
+    className="relative object-contain group-hover:scale-105 transition-transform duration-500" 
+    sizes="(max-width: 768px) 100vw, 33vw"
+  />
+</Link>
 
-        <h3>{event.name}</h3>
+      <div className="event-card-body p-5">
+        <p className="event-label text-xs font-bold text-orange-500 uppercase tracking-wider mb-2">{event.type}</p>
 
-        <div className="event-card-info">
-          <div className="event-day">
-            <strong>{date?.getDate()}</strong>
-            <span>
+        <h3 className="text-lg font-bold text-gray-900 mb-4 line-clamp-2">{event.name}</h3>
+
+        <div className="event-card-info flex items-center gap-4 border-t border-gray-50 pt-4">
+          <div className="event-day flex flex-col items-center bg-gray-50 px-3 py-1 rounded-lg">
+            <strong className="text-lg text-gray-800 leading-none">{date?.getDate()}</strong>
+            <span className="text-[10px] uppercase font-bold text-gray-500">
               {date?.toLocaleDateString("en-IN", {
                 month: "short",
-                year: "numeric",
               })}
             </span>
           </div>
 
-          <div>
-            <p>{event.location}</p>
-
-            <Link href={`/events/${event.id}`}>Know More</Link>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-600 truncate">{event.location}</p>
+            <Link 
+              href={`/events/${event.id}`}
+              className="text-sm font-semibold text-blue-600 hover:underline mt-1 block"
+            >
+              Know More
+            </Link>
           </div>
         </div>
       </div>

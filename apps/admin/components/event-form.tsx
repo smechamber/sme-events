@@ -9,14 +9,195 @@ import MultiImageUpload from "./MultiImageUpload";
 import MultiVideoUpload from "./MultiVideoUpload";
 import { EventSectionEditor } from "./event-section-editor";
 
-const sectionsFrom = (event?: AdminEvent | null): EventSections => ({ agenda: event?.agenda ?? [], book: event?.book ?? { enabled: true, instructions: "" }, contactUs: event?.contactUs ?? {}, info: event?.info ?? [], mediaKit: event?.mediaKit ?? {}, overview: event?.overview ?? {}, speakers: event?.speakers ?? [], sponsors: event?.sponsors ?? [], venue: event?.venue ?? {} });
-const date = (value?: string) => value ? new Date(value).toISOString().slice(0, 10) : "";
+const sectionsFrom = (event?: AdminEvent | null): EventSections => ({
+  agenda: event?.agenda ?? [],
+  book: event?.book ?? { enabled: true, instructions: "" },
+  contactUs: event?.contactUs ?? {},
+  info: event?.info ?? [],
+  mediaKit: event?.mediaKit ?? {},
+  overview: event?.overview ?? {},
+  speakers: event?.speakers ?? [],
+  sponsors: event?.sponsors ?? [],
+  venue: event?.venue ?? {},
+});
+const date = (value?: string) =>
+  value ? new Date(value).toISOString().slice(0, 10) : "";
 
 export function EventForm({ event }: { event?: AdminEvent | null }) {
-  const router = useRouter(); const [saving, setSaving] = useState(false); const [error, setError] = useState("");
-  const [form, setForm] = useState({ name: event?.name ?? "", type: event?.type ?? "", startDate: date(event?.startDate), endDate: date(event?.endDate), startTime: event?.startTime ?? "", endTime: event?.endTime ?? "", location: event?.location ?? "", image: event?.image ?? "", galleryImages: event?.galleryImages ?? [], galleryVideos: event?.galleryVideos ?? [], status: event?.status ?? "DRAFT", guestPrice: event?.guestPrice ?? 0, memberPrice: event?.memberPrice ?? 0 });
-  const [sections, setSections] = useState<EventSections>(sectionsFrom(event)); const [tickets, setTickets] = useState<TicketTier[]>(event?.tickets ?? []);
-  const set = (key: keyof typeof form, value: string | string[] | number) => setForm(current => ({ ...current, [key]: value }));
-  async function submit(e: React.FormEvent) { e.preventDefault(); setSaving(true); setError(""); const payload: EventFormPayload = { ...form, startDate: form.startDate || undefined, endDate: form.endDate || undefined, startTime: form.startTime || undefined, endTime: form.endTime || undefined, agenda: sections.agenda, book: sections.book, contactUs: sections.contactUs, info: sections.info, mediaKit: sections.mediaKit, overview: sections.overview, speakers: sections.speakers, sponsors: sections.sponsors, venue: sections.venue, tickets }; try { await saveEvent(payload, event?.id?.toString()); router.push("/events"); router.refresh(); } catch { setError("Event save nahi hua. Required fields check karo."); setSaving(false); } }
-  return <form className="event-editor" onSubmit={submit}>{error ? <div className="form-error">{error}</div> : null}<section className="form-section"><div className="section-title"><div><p>Event setup</p><h2>Event details</h2></div></div><div className="form-grid"><label>Name<input required value={form.name} onChange={e => set("name", e.target.value)} /></label><label>Type<input required value={form.type} onChange={e => set("type", e.target.value)} /></label><label>Start date<input type="date" value={form.startDate} onChange={e => set("startDate", e.target.value)} /></label><label>End date<input type="date" value={form.endDate} onChange={e => set("endDate", e.target.value)} /></label><label>Start time<input value={form.startTime} onChange={e => set("startTime", e.target.value)} /></label><label>End time<input value={form.endTime} onChange={e => set("endTime", e.target.value)} /></label><label>Location<input required value={form.location} onChange={e => set("location", e.target.value)} /></label><label>Status<input required value={form.status} onChange={e => set("status", e.target.value)} /></label><label>Guest price<input type="number" min="0" value={form.guestPrice} onChange={e => set("guestPrice", Number(e.target.value))} /></label><label>Member price<input type="number" min="0" value={form.memberPrice} onChange={e => set("memberPrice", Number(e.target.value))} /></label></div></section><section className="form-section"><div className="section-title"><div><p>Media</p><h2>Image and galleries</h2></div></div><ImageUpload value={form.image} onChange={url => set("image", url)} /><MultiImageUpload value={form.galleryImages} onChange={urls => set("galleryImages", urls)} /><MultiVideoUpload value={form.galleryVideos} onChange={urls => set("galleryVideos", urls)} /></section><EventSectionEditor sections={sections} onChange={setSections} tickets={tickets} onTicketsChange={setTickets} /><div className="save-bar"><span>Only requested Event fields will be saved.</span><button className="btn" disabled={saving}><Save size={17} /> {saving ? "Saving…" : "Save event"}</button></div></form>;
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    name: event?.name ?? "",
+    type: event?.type ?? "",
+    startDate: date(event?.startDate),
+    endDate: date(event?.endDate),
+    startTime: event?.startTime ?? "",
+    endTime: event?.endTime ?? "",
+    location: event?.location ?? "",
+    image: event?.image ?? "",
+    galleryImages: event?.galleryImages ?? [],
+    galleryVideos: event?.galleryVideos ?? [],
+    status: event?.status ?? "DRAFT",
+    guestPrice: event?.guestPrice ?? 0,
+    memberPrice: event?.memberPrice ?? 0,
+  });
+  const [sections, setSections] = useState<EventSections>(sectionsFrom(event));
+  const [tickets, setTickets] = useState<TicketTier[]>(event?.tickets ?? []);
+  const set = (key: keyof typeof form, value: string | string[] | number) =>
+    setForm((current) => ({ ...current, [key]: value }));
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    const payload: EventFormPayload = {
+      ...form,
+      startDate: form.startDate || undefined,
+      endDate: form.endDate || undefined,
+      startTime: form.startTime || undefined,
+      endTime: form.endTime || undefined,
+      agenda: sections.agenda,
+      book: sections.book,
+      contactUs: sections.contactUs,
+      info: sections.info,
+      mediaKit: sections.mediaKit,
+      overview: sections.overview,
+      speakers: sections.speakers,
+      sponsors: sections.sponsors,
+      venue: sections.venue,
+      tickets,
+    };
+    try {
+      await saveEvent(payload, event?.id?.toString());
+      router.push("/events");
+      router.refresh();
+    } catch {
+      setError("Event save nahi hua. Required fields check karo.");
+      setSaving(false);
+    }
+  }
+  return (
+    <form className="event-editor" onSubmit={submit}>
+      {error ? <div className="form-error">{error}</div> : null}
+      <section className="form-section">
+        <div className="section-title">
+          <div>
+            <p>Event setup</p>
+            <h2>Event details</h2>
+          </div>
+        </div>
+        <div className="form-grid">
+          <label>
+            Name
+            <input
+              required
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+            />
+          </label>
+          <label>
+            Type
+            <input
+              required
+              value={form.type}
+              onChange={(e) => set("type", e.target.value)}
+            />
+          </label>
+          <label>
+            Start date
+            <input
+              type="date"
+              value={form.startDate}
+              onChange={(e) => set("startDate", e.target.value)}
+            />
+          </label>
+          <label>
+            End date
+            <input
+              type="date"
+              value={form.endDate}
+              onChange={(e) => set("endDate", e.target.value)}
+            />
+          </label>
+          <label>
+            Start time
+            <input
+              value={form.startTime}
+              onChange={(e) => set("startTime", e.target.value)}
+            />
+          </label>
+          <label>
+            End time
+            <input
+              value={form.endTime}
+              onChange={(e) => set("endTime", e.target.value)}
+            />
+          </label>
+          <label>
+            Location
+            <input
+              required
+              value={form.location}
+              onChange={(e) => set("location", e.target.value)}
+            />
+          </label>
+          <label>
+            Status
+            <input
+              required
+              value={form.status}
+              onChange={(e) => set("status", e.target.value)}
+            />
+          </label>
+          <label>
+            Guest price
+            <input
+              type="number"
+              min="0"
+              value={form.guestPrice}
+              onChange={(e) => set("guestPrice", Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Member price
+            <input
+              type="number"
+              min="0"
+              value={form.memberPrice}
+              onChange={(e) => set("memberPrice", Number(e.target.value))}
+            />
+          </label>
+        </div>
+      </section>
+      <section className="form-section">
+        <div className="section-title">
+          <div>
+            <p>Media</p>
+            <h2>Image and galleries</h2>
+          </div>
+        </div>
+        <ImageUpload value={form.image} onChange={(url) => set("image", url)} />
+        <MultiImageUpload
+          value={form.galleryImages}
+          onChange={(urls) => set("galleryImages", urls)}
+        />
+        <MultiVideoUpload
+          value={form.galleryVideos}
+          onChange={(urls) => set("galleryVideos", urls)}
+        />
+      </section>
+      <EventSectionEditor
+        sections={sections}
+        onChange={setSections}
+        tickets={tickets}
+        onTicketsChange={setTickets}
+      />
+      <div className="save-bar">
+        <span>Only requested Event fields will be saved.</span>
+        <button className="btn" disabled={saving}>
+          <Save size={17} /> {saving ? "Saving…" : "Save event"}
+        </button>
+      </div>
+    </form>
+  );
 }
