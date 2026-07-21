@@ -69,6 +69,7 @@ export async function POST(request: Request) {
             description: ticket.description,
             quantity: ticket.quantity,
             isFree: ticket.isFree ?? ticket.price === 0,
+            requiresApproval: ticket.requiresApproval ?? false,
           })),
         },
       },

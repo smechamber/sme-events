@@ -44,6 +44,7 @@ model EventTicket {
   quantity    Int
   sold        Int    @default(0)
   isFree      Boolean @default(false)
+  requiresApproval Boolean @default(false)
   event       Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   bookings    EventBooking[]
 }
@@ -57,7 +58,10 @@ model EventBooking {
   phone        String?
   quantity     Int          @default(1)
   amount       Int          @default(0)
+  paymentAmountPaise Int    @default(0)
   paymentId    String?
+  razorpayOrderId String?   @unique
+  registrationData Json?
   status       String       @default("PENDING")
   createdAt    DateTime     @default(now())
   event        Event        @relation(fields: [eventId], references: [id])

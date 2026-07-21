@@ -148,45 +148,59 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Speakers */}
-      <section className="py-20 lg:py-28" id="speakers">
-        <div className="max-w-[1630px] mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow="Featured Speakers"
-            title="Leaders attendees already trust."
-            copy="Only render speaker sections when speaker data exists on an event detail page; the homepage highlights marquee speakers from the featured event."
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
-            {(featured.speakers ?? []).map((speaker) => (
-              <article className="flex flex-col items-center text-center group" key={speaker.name}>
-                <div className="relative w-32 h-32 mb-5 overflow-hidden rounded-full border-4 border-gray-100 group-hover:border-[#f39c12] transition-colors">
-                  <Image src={speaker.image} alt={speaker.name} fill className="object-cover" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">{speaker.name}</h3>
-                <p className="text-sm text-gray-600 mt-1 font-medium">
-                  {speaker.role}, <span className="text-[#e31837]">{speaker.company}</span>
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Sponsors */}
-      <section className="py-20 lg:py-28 bg-gray-50 border-y border-gray-200" id="partners">
-        <div className="max-w-[1630px] mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow="Sponsors"
-            title="Sponsors and Partners"
-            copy="Our partners help create bigger conversations and stronger communities."
-          />
-          <div className="flex flex-wrap justify-center items-center gap-12 mt-16 opacity-60 hover:opacity-100 transition-opacity duration-500">
-           {(featured.sponsors ?? []).map((sponsor) => (
-              <span key={sponsor.name} className="text-2xl font-extrabold text-gray-400 uppercase tracking-widest">{sponsor.name}</span>
-            ))}
+{/* Speakers */}
+<section className="py-20 lg:py-28" id="speakers">
+  <div className="max-w-[1630px] mx-auto px-4 sm:px-6 lg:px-8">
+    <SectionHeading
+      eyebrow="Featured Speakers"
+      title="Leaders attendees already trust."
+      copy="Only render speaker sections when speaker data exists on an event detail page; the homepage highlights marquee speakers from the featured event."
+    />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+      {(featured.speakers ?? []).map((speaker, index) => (
+        <article className="flex flex-col items-center text-center group" key={speaker.id || `speaker-${index}`}>
+          {/* Added bg-gray-100 and flex center for the fallback */}
+          <div className="relative flex items-center justify-center w-32 h-32 mb-5 overflow-hidden rounded-full border-4 border-gray-100 bg-gray-100 group-hover:border-[#f39c12] transition-colors">
+            
+            {/* CONDITIONALLY RENDER THE IMAGE 👇 */}
+            {speaker.image && speaker.image.trim() !== "" ? (
+              <Image src={speaker.image} alt={speaker.name || "Speaker"} fill className="object-cover" />
+            ) : (
+              // Fallback if no image exists (Shows the first letter of their name)
+              <span className="text-gray-400 font-bold text-4xl uppercase">
+                {speaker.name ? speaker.name.charAt(0) : "S"}
+              </span>
+            )}
+            
           </div>
-        </div>
-      </section>
+          <h3 className="text-xl font-bold text-gray-900">{speaker.name}</h3>
+          <p className="text-sm text-gray-600 mt-1 font-medium">
+            {speaker.role}, <span className="text-[#e31837]">{speaker.company}</span>
+          </p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+     {/* Sponsors */}
+<section className="py-20 lg:py-28 bg-gray-50 border-y border-gray-200" id="partners">
+  <div className="max-w-[1630px] mx-auto px-4 sm:px-6 lg:px-8">
+    <SectionHeading
+      eyebrow="Sponsors"
+      title="Sponsors and Partners"
+      copy="Our partners help create bigger conversations and stronger communities."
+    />
+    <div className="flex flex-wrap justify-center items-center gap-12 mt-16 opacity-60 hover:opacity-100 transition-opacity duration-500">
+      {(featured.sponsors ?? []).map((sponsor, index) => (
+        <span key={sponsor.id || `sponsor-${index}`} className="text-2xl font-extrabold text-gray-400 uppercase tracking-widest">
+          {sponsor.name}
+        </span>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* FAQ */}
       <section className="py-20 lg:py-28" id="faq">

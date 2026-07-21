@@ -76,8 +76,8 @@ export const demoEvents: PlatformEvent[] = [
     guestPrice: 14900,
     memberPrice: 12000,
     tickets: [
-      { id: 1, eventId: 1, name: "Delegate Pass", price: 14900, description: "Main stage, expo, lunch, and networking.", quantity: 120, sold: 0 },
-      { id: 2, eventId: 1, name: "Executive Pass", price: 29900, description: "Delegate access plus VIP lounge and dinner.", quantity: 42, sold: 0 }
+      { id: "1", name: "Delegate Pass", price: 14900, description: "Main stage, expo, lunch, and networking.", quantity: 120, sold: 0 },
+      { id: "2", name: "Executive Pass", price: 29900, description: "Delegate access plus VIP lounge and dinner.", quantity: 42, sold: 0 }
     ]
   }
 ];
@@ -128,7 +128,7 @@ export async function getPastEvents() {
   // 1. Filter: Jo events aaj se pehle ke hain
   // 2. Status: Sirf 'ARCHIVED' ya purane events
   return events
-    .filter((event) => new Date(event.startDate) < now)
+    .filter((event) => event.startDate && new Date(event.startDate) < now)
     .map((event) => ({
       ...event,
       status: "ARCHIVED" as const, // Status ko explicitly archived set kar rahe hain

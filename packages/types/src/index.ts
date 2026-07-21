@@ -59,6 +59,18 @@ export type Book = {
   instructions?: string;
 };
 
+export type EventSections = {
+  agenda?: AgendaItem[];
+  book?: Book;
+  contactUs?: ContactUs;
+  info?: string[];
+  mediaKit?: MediaKit;
+  overview?: Overview;
+  speakers?: Speaker[];
+  sponsors?: Sponsor[];
+  venue?: Venue;
+};
+
 export type Overview = {
   heading?: string;
   content?: string;
@@ -118,13 +130,19 @@ export type EventBooking = {
   amount: number;
 
   paymentId?: string;
+  paymentAmountPaise?: number;
+  registrationData?: Record<string, unknown>;
 
   status:
     | "PENDING"
+    | "PENDING_PAYMENT"
     | "PAID"
     | "FAILED"
     | "FREE"
-    | "CANCELLED";
+    | "CANCELLED"
+    | "PENDING_APPROVAL"
+    | "APPROVED"
+    | "REJECTED";
 
   createdAt: string;
 };

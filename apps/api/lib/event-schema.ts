@@ -4,7 +4,7 @@ const jsonObject = z.record(z.unknown());
 const jsonRecord = jsonObject.optional().nullable();
 
 export const eventTicketSchema = z.object({
-  id: z.string().optional(), name: z.string().min(1), price: z.coerce.number().int().min(0), description: z.string().default(""), quantity: z.coerce.number().int().min(0), sold: z.coerce.number().int().min(0).optional(), isFree: z.boolean().optional()
+  id: z.string().optional(), name: z.string().min(1), price: z.coerce.number().int().min(0), description: z.string().default(""), quantity: z.coerce.number().int().min(0), sold: z.coerce.number().int().min(0).optional(), isFree: z.boolean().optional(), requiresApproval: z.boolean().optional()
 });
 
 export const eventPayloadSchema = z.object({
@@ -36,5 +36,20 @@ export const eventPayloadSchema = z.object({
 });
 
 export const bookingPayloadSchema = z.object({
-  eventId: z.coerce.number().int(), ticketId: z.string().optional(), attendeeName: z.string().min(1), email: z.string().email(), phone: z.string().optional(), quantity: z.coerce.number().int().min(1).default(1)
+  eventId: z.coerce.number().int().positive(),
+  ticketId: z.string().min(1),
+  attendeeName: z.string().trim().min(1),
+  attendeeEmail: z.string().trim().email(),
+  attendeePhone: z.string().trim().min(6).max(25),
+  companyName: z.string().trim().max(200).optional(),
+  designation: z.string().trim().max(200).optional(),
+  registrationData: z.record(z.unknown()).optional(),
+  quantity: z.coerce.number().int().min(1).max(10).default(1),
+});
+
+export const paymentVerificationSchema = z.object({
+  bookingId: z.string().min(1),
+  razorpayOrderId: z.string().min(1),
+  razorpayPaymentId: z.string().min(1),
+  razorpaySignature: z.string().min(1),
 });

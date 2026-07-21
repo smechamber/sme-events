@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, Calendar, Clock, MapPin } from "lucide-react";
-import { formatMoney } from "@events/utils";
+import { ArrowRight, Calendar, Clock, MapPin, Ticket } from "lucide-react";
 import { getEventById } from "../../../lib/events"; 
+
 import { OverviewSection } from "../../../components/EventTabs/events-section/Overview";
 import { MediaKitSection } from "../../../components/EventTabs/events-section/MediaKit";
 import { AgendaSection } from "../../../components/EventTabs/events-section/Agenda";
@@ -13,6 +13,7 @@ import { SponsorsSection } from "../../../components/EventTabs/events-section/Sp
 import { VenueSection } from "../../../components/EventTabs/events-section/Venue";
 import { GeneralInfoSection } from "../../../components/EventTabs/events-section/Info";
 import { ContactSection } from "../../../components/EventTabs/events-section/Contact";
+import EventBookingSection from "../../../components/EventTabs/events-section/EventBookingSection";
 
 export const revalidate = 300;
 
@@ -52,8 +53,9 @@ export default async function EventDetailPage({ params }: Props) {
     notFound();
   }
 
-  // 2. TAB VISIBILITY LOGIC
+  // 2. TAB VISIBILITY LOGIC (Added "Tickets" tab at the top)
   const tabs = [
+    { label: "Tickets", id: "tickets", exists: true }, // 👇 Tickets Tab
     { label: "Overview", id: "overview", exists: event.overview },
     { label: "Media Kit", id: "media-kit", exists: event.mediaKit },
     { label: "Agenda", id: "agenda", exists: event.agenda?.length },
@@ -171,8 +173,17 @@ export default async function EventDetailPage({ params }: Props) {
           </nav>
         </aside>
 
-        {/* COLUMN 2: CENTER */}
+        {/* COLUMN 2: CENTER (All dynamic event sections) */}
         <div className="flex-1 w-full min-w-0 space-y-12 md:space-y-16">
+          
+          {/* 👇 NEW TICKETS SECTION INJECTED HERE 👇 */}
+          <div id="tickets" className="scroll-mt-32">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <Ticket className="text-[#008DD2]" /> Select Tickets
+            </h2>
+            <EventBookingSection event={event} />
+          </div>
+
           <div id="overview" className="scroll-mt-32">
             <OverviewSection overview={event.overview} eventName={event.name} />
           </div>
@@ -182,7 +193,6 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
 
           <div id="agenda" className="scroll-mt-32">
-            {/* 🚨 YAHAN allSpeakers PASS KIYA HAI 🚨 */}
             <AgendaSection agenda={event.agenda} allSpeakers={event.speakers} />
           </div>
 
@@ -207,7 +217,7 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* COLUMN 3: RIGHT SIDEBAR */}
+        {/* COLUMN 3: RIGHT SIDEBAR (Updated Booking Card) */}
         <aside 
           className="w-full lg:w-[320px] xl:w-[350px] shrink-0 sticky top-32 bg-white p-6 rounded-xl shadow-sm border border-gray-200" 
           id="book" 
@@ -241,35 +251,18 @@ export default async function EventDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <div className="pt-5 border-t border-gray-100 space-y-3">
-              {(event.memberPrice !== undefined || event.guestPrice !== undefined) ? (
-                <>
-                  {event.memberPrice !== undefined && (
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Member Price</span>
-                      <span className="font-bold text-gray-900 text-base">{formatMoney(event.memberPrice)}</span>
-                    </div>
-                  )}
-                  {event.guestPrice !== undefined && (
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Guest Price</span>
-                      <span className="font-bold text-gray-900 text-base">{formatMoney(event.guestPrice)}</span>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <p className="text-center text-emerald-600 font-semibold bg-emerald-50 py-2 rounded-md">
-                  Free Event
-                </p>
-              )}
+            <div className="pt-5 border-t border-gray-100">
+              {/* 👇 SCROLL TO TICKETS BUTTON (Old hardcoded pricing removed) 👇 */}
+              <a 
+                href="#tickets"
+                className="w-full bg-[#008DD2] hover:bg-[#0074b0] text-white font-bold py-3.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm"
+              >
+                Select Tickets <ArrowRight size={18} />
+              </a>
+              <p className="text-xs text-center text-gray-400 mt-3">
+                Secure your spot early. Seats are limited.
+              </p>
             </div>
-
-            <button className="w-full bg-[#008DD2] hover:bg-[#0074b0] text-white font-bold py-3.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
-              Book Tickets <ArrowRight size={18} />
-            </button>
-            <p className="text-xs text-center text-gray-400">
-              Secure your spot early. Seats are limited.
-            </p>
           </div>
         </aside>
 

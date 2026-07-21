@@ -1,7 +1,11 @@
 import { prisma } from "@events/db";
-import { fail, ok } from "../../../../../lib/http";
+import { fail, ok, options } from "../../../../../lib/http";
 
 export const dynamic = "force-dynamic";
+
+export async function OPTIONS() {
+  return options();
+}
 
 type Params = {
   params: Promise<{ id: string }>;
@@ -9,9 +13,10 @@ type Params = {
 
 export async function GET(_: Request, { params }: Params) {
   try {
-    const { id } = await params;
-    const event = await prisma.event.findFirst({
-      where: { OR: [{ id }, { slug: id }] },
+    const id = Number((await params).id);
+    if (!Number.isInteger(id)) return fail(new Error("EVENT_NOT_FOUND"), 404);
+    const event = await prisma.event.findUnique({
+      where: { id },
       include: { tickets: true }
     });
 
@@ -20,9 +25,16 @@ export async function GET(_: Request, { params }: Params) {
     }
 
     return ok(
-      event.tickets.map((ticket: { quantity: number; sold: number }) => ({
-        ...ticket,
-        available: Math.max(ticket.quantity - ticket.sold, 0)
+      event.tickets.map((ticket) => ({
+        id: ticket.id,
+        name: ticket.name,
+        price: ticket.price,
+        description: ticket.description,
+        type: ticket.isFree || ticket.price === 0 ? "FREE" : "PAID",
+        audience: "ALL",
+        currency: "INR",
+        requiresApproval: (ticket as typeof ticket & { requiresApproval?: boolean }).requiresApproval ?? false,
+        remaining: Math.max(ticket.quantity - ticket.sold, 0),
       }))
     );
   } catch (error) {
