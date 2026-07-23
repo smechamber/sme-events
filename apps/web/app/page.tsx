@@ -159,7 +159,7 @@ export default async function HomePage() {
     />
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
       {(featured.speakers ?? []).map((speaker, index) => (
-        <article className="flex flex-col items-center text-center group" key={speaker.id || `speaker-${index}`}>
+        <article className="flex flex-col items-center text-center group" key={`speaker-${index}`}>
           {/* Added bg-gray-100 and flex center for the fallback */}
           <div className="relative flex items-center justify-center w-32 h-32 mb-5 overflow-hidden rounded-full border-4 border-gray-100 bg-gray-100 group-hover:border-[#f39c12] transition-colors">
             
@@ -194,7 +194,7 @@ export default async function HomePage() {
     />
     <div className="flex flex-wrap justify-center items-center gap-12 mt-16 opacity-60 hover:opacity-100 transition-opacity duration-500">
       {(featured.sponsors ?? []).map((sponsor, index) => (
-        <span key={sponsor.id || `sponsor-${index}`} className="text-2xl font-extrabold text-gray-400 uppercase tracking-widest">
+        <span key={`sponsor-${index}`} className="text-2xl font-extrabold text-gray-400 uppercase tracking-widest">
           {sponsor.name}
         </span>
       ))}
