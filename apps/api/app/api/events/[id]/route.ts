@@ -79,7 +79,7 @@ export async function PUT(
     const idsToDelete = ticketsToDelete.map((t: any) => t.id);
 
     // 4. Perform the safe update
-    const event = await prisma.$transaction(async (tx) => {
+    const event = await prisma.$transaction(async (tx: any) => {
       await tx.event.update({
         where: { id },
         data: {
