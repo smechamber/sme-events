@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     if (!payment?.id || !payment.order_id) return fail(new Error("INVALID_WEBHOOK"), 400);
 
     let shouldNotify = false;
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx:any) => {
       const booking = await tx.eventBooking.findUnique({
         where: { razorpayOrderId: payment.order_id },
         include: { ticket: true },
