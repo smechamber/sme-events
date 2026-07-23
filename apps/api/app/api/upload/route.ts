@@ -9,8 +9,8 @@ const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
 const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024;
 
 const media = new MediaClient({
-  baseUrl: process.env.MEDIA_SERVER_URL!,
-  token: process.env.MEDIA_SERVER_SECRET!,
+  baseUrl: process.env.MEDIA_SERVER_URL || "https://dummy-url.com",
+  token: process.env.MEDIA_SERVER_SECRET || "dummy-token",
 });
 
 function response(body: object, status = 200) {
