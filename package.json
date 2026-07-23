@@ -13,6 +13,7 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "postinstall": "npm run db:generate",
     "db:generate": "prisma generate --schema packages/db/prisma/schema.prisma",
     "db:push": "prisma db push --schema packages/db/prisma/schema.prisma",
     "db:pull": "prisma db pull --schema packages/db/prisma/schema.prisma",
