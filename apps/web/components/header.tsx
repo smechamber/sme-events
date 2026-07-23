@@ -18,8 +18,8 @@ import Image from "next/image";
 const links = [
   // ["Home", "/"],
   ["Upcoming Events", "/#upcoming"],
-  ["Past Events", "/#past-events"],
-  ["Partner with us", "/#partners"],
+  ["Past Events", "/events/past-events"],
+  ["Partner with us", "/partner-with-us"],
   ["About us", "/#about"],
 ];
 

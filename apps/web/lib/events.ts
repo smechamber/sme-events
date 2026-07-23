@@ -91,9 +91,7 @@ async function apiFetch<T>(path: string, fallback: T): Promise<T> {
     return fallback;
   }
   try {
-    const response = await fetch(`${apiBaseUrl}${path}`, {
-      next: { revalidate: 300 }
-    });
+    const response = await fetch(`${apiBaseUrl}${path}`, { cache: "no-store" });
 
     if (!response.ok) {
       return fallback;
@@ -118,23 +116,37 @@ export async function getEventById(id: number) {
 
 export async function getFeaturedEvent() {
   const events = await listEvents();
-  return events.find((event) => event.status === "PUBLISHED") ?? events[0] ?? demoEvents[0];
+  return getUpcomingEventsFrom(events)[0] ?? events.find((event) => event.status === "PUBLISHED") ?? events[0] ?? demoEvents[0];
+}
+
+export function isPastEvent(event: PlatformEvent, referenceDate = new Date()) {
+  const lastEventDate = event.endDate ?? event.startDate;
+  if (!lastEventDate) return false;
+
+  const datePart = lastEventDate.slice(0, 10);
+  // Admin date fields are calendar dates. Keep them upcoming through the end
+  // of that date in India unless a specific event end time was supplied.
+  const date = event.endTime
+    ? new Date(`${datePart}T${event.endTime}:00+05:30`)
+    : new Date(`${datePart}T23:59:59.999+05:30`);
+  return date.getTime() < referenceDate.getTime();
+}
+
+export function getUpcomingEventsFrom(events: PlatformEvent[]) {
+  return events.filter(
+    (event) => event.status === "PUBLISHED" && !isPastEvent(event),
+  );
 }
 
 export async function getUpcomingEvents() {
-  return listEvents();
+  return getUpcomingEventsFrom(await listEvents());
 }
 
 export async function getPastEvents() {
   const events = await listEvents();
-  const now = new Date();
-  
-  // 1. Filter events that occurred before today.
-  // 2. Include only archived or past events.
-  return events
-    .filter((event) => event.startDate && new Date(event.startDate) < now)
-    .map((event) => ({
-      ...event,
-      status: "ARCHIVED" as const, // Explicitly set the status to archived.
-    }));
+  return events.filter((event) => isPastEvent(event)).sort((a, b) => {
+    const aDate = new Date(a.endDate ?? a.startDate ?? 0).getTime();
+    const bDate = new Date(b.endDate ?? b.startDate ?? 0).getTime();
+    return bDate - aDate;
+  });
 }

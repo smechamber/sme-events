@@ -11,8 +11,7 @@ export default async function UpcomingEventsPage() {
   // Fetch data in the server component.
   const events = await getUpcomingEvents();
   
-  // Optionally display only published events.
-  const upcoming = events.filter(e => e.status === "DRAFT");
+  const upcoming = events;
 
   return (
     <main className="min-h-screen bg-gray-50 pt-32 pb-20 mt-14">

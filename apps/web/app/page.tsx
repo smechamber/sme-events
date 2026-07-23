@@ -1,16 +1,21 @@
-import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Building2, Globe2, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
+import { ArrowRight, BadgeCheck, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
 import { EventCard } from "../components/event-card";
 import { Hero } from "../components/hero";
 import { SectionHeading } from "../components/section-heading";
-import { getFeaturedEvent, getPastEvents, getUpcomingEvents, listEvents } from "../lib/events";
+import { getFeaturedEvent, getUpcomingEvents, listEvents } from "../lib/events";
 import type { LucideIcon } from "lucide-react";
 
-const Newsletter = dynamic(() => import("../components/newsletter").then((mod) => mod.Newsletter), {
-  loading: () => <div className="p-10 text-center text-gray-500 animate-pulse">Loading newsletter...</div>
-});
+type HomeSpeaker = { name: string; image?: string; description?: string; role?: string; company?: string; roles?: Array<{ designation?: string; company?: string }> };
+type HomeSponsor = { name: string; logo?: string; website?: string; websiteUrl?: string };
+
+function speakersFromEvents(events: Array<{ speakers?: unknown }>): HomeSpeaker[] {
+  return events.flatMap((event) => Array.isArray(event.speakers) ? event.speakers.flatMap((item: any) => Array.isArray(item?.speakers) ? item.speakers : item?.name ? [item] : []) : []).filter((speaker: HomeSpeaker) => Boolean(speaker.name?.trim()));
+}
+
+function sponsorsFromEvents(events: Array<{ sponsors?: unknown }>): HomeSponsor[] {
+  return events.flatMap((event) => Array.isArray(event.sponsors) ? event.sponsors.flatMap((item: any) => Array.isArray(item?.sponsors) ? item.sponsors : item?.name ? [item] : []) : []).filter((sponsor: HomeSponsor) => Boolean(sponsor.name?.trim() || sponsor.logo));
+}
 
 export const revalidate = 300;
 
@@ -34,10 +39,9 @@ const valueProps: Array<{ Icon: LucideIcon; title: string; copy: string }> = [
 ];
 
 export default async function HomePage() {
-  const [featured, upcoming, past, allEvents] = await Promise.all([
+  const [featured, upcoming, allEvents] = await Promise.all([
     getFeaturedEvent(),
     getUpcomingEvents(),
-    getPastEvents(),
     listEvents()
   ]);
 
@@ -54,6 +58,8 @@ export default async function HomePage() {
     image: featured.image,
     description: featured.overview?.content ?? featured.overview?.heading ?? featured.name
   };
+  const speakers = speakersFromEvents(allEvents);
+  const sponsors = sponsorsFromEvents(allEvents);
 
   return (
     <main className="min-h-screen bg-white">
@@ -72,7 +78,7 @@ export default async function HomePage() {
     />
     
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-12">
-      {allEvents.map((event) => (
+      {upcoming.slice(0, 6).map((event) => (
         <EventCard event={event} key={event.id} />
       ))}
     </div>
@@ -90,19 +96,10 @@ export default async function HomePage() {
   </div>
 </section>
 
-      {/* Past Events */}
-      {/* <section className="py-20 lg:py-28 bg-gray-50 border-y border-gray-100" id="past-events">
+      {/* <section className="py-20 bg-gray-50 border-y border-gray-100" id="past-events">
         <div className="max-w-[1630px] mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow="Past Events"
-            title="More events, more ideas."
-            copy="Explore our events calendar and find the right room for your next big conversation."
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-12">
-            {upcoming.map((event) => (
-              <EventCard event={event} key={event.id} />
-            ))}
-          </div>
+          <SectionHeading eyebrow="Past Events" title="Moments worth revisiting." copy="Browse event highlights, galleries, and videos from our completed programs." />
+          <Link href="/events/past-events" className="inline-flex items-center gap-2 text-sm font-semibold text-[#e31837] hover:underline">Explore past events <ArrowRight size={16} /></Link>
         </div>
       </section> */}
 
@@ -155,17 +152,17 @@ export default async function HomePage() {
     <SectionHeading
       eyebrow="Featured Speakers"
       title="Leaders attendees already trust."
-      copy="Only render speaker sections when speaker data exists on an event detail page; the homepage highlights marquee speakers from the featured event."
+      copy="Meet every speaker added to our upcoming and completed events."
     />
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
-      {(featured.speakers ?? []).map((speaker, index) => (
-        <article className="flex flex-col items-center text-center group" key={`speaker-${index}`}>
+      {speakers.map((speaker, index) => (
+        <article className="flex flex-col items-center text-center group" key={`${speaker.name}-${index}`}>
           {/* Added bg-gray-100 and flex center for the fallback */}
           <div className="relative flex items-center justify-center w-32 h-32 mb-5 overflow-hidden rounded-full border-4 border-gray-100 bg-gray-100 group-hover:border-[#f39c12] transition-colors">
             
             {/* CONDITIONALLY RENDER THE IMAGE 👇 */}
             {speaker.image && speaker.image.trim() !== "" ? (
-              <Image src={speaker.image} alt={speaker.name || "Speaker"} fill className="object-cover" />
+              <img src={speaker.image} alt={speaker.name} className="h-full w-full object-cover" />
             ) : (
               // Fallback if no image exists (Shows the first letter of their name)
               <span className="text-gray-400 font-bold text-4xl uppercase">
@@ -175,11 +172,12 @@ export default async function HomePage() {
             
           </div>
           <h3 className="text-xl font-bold text-gray-900">{speaker.name}</h3>
-          <p className="text-sm text-gray-600 mt-1 font-medium">
-            {speaker.role}, <span className="text-[#e31837]">{speaker.company}</span>
-          </p>
+          {speaker.roles?.map((role, roleIndex) => <p className="text-sm text-gray-600 mt-1 font-medium" key={roleIndex}>{role.designation}{role.company ? <>, <span className="text-[#e31837]">{role.company}</span></> : null}</p>)}
+          {!speaker.roles?.length && <p className="text-sm text-gray-600 mt-1 font-medium">{speaker.role}{speaker.company ? <>, <span className="text-[#e31837]">{speaker.company}</span></> : null}</p>}
+          {speaker.description ? <p className="mt-3 max-w-xs text-sm leading-relaxed text-gray-500">{speaker.description}</p> : null}
         </article>
       ))}
+      {!speakers.length && <p className="col-span-full text-center text-gray-500">Speakers added from admin event pages will appear here.</p>}
     </div>
   </div>
 </section>
@@ -192,12 +190,13 @@ export default async function HomePage() {
       title="Sponsors and Partners"
       copy="Our partners help create bigger conversations and stronger communities."
     />
-    <div className="flex flex-wrap justify-center items-center gap-12 mt-16 opacity-60 hover:opacity-100 transition-opacity duration-500">
-      {(featured.sponsors ?? []).map((sponsor, index) => (
-        <span key={`sponsor-${index}`} className="text-2xl font-extrabold text-gray-400 uppercase tracking-widest">
-          {sponsor.name}
-        </span>
-      ))}
+    <div className="grid grid-cols-2 gap-5 mt-12 sm:grid-cols-3 lg:grid-cols-5">
+      {sponsors.map((sponsor, index) => {
+        const content = <div className="flex h-28 items-center justify-center rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md">{sponsor.logo ? <img src={sponsor.logo} alt={sponsor.name || "Sponsor"} className="h-full w-full object-contain" /> : <span className="text-center text-sm font-bold uppercase tracking-wide text-gray-600">{sponsor.name}</span>}</div>;
+        const website = sponsor.website ?? sponsor.websiteUrl;
+        return website ? <a key={`${sponsor.name}-${index}`} href={website.startsWith("http") ? website : `https://${website}`} target="_blank" rel="noreferrer">{content}</a> : <div key={`${sponsor.name}-${index}`}>{content}</div>;
+      })}
+      {!sponsors.length && <p className="col-span-full text-center text-gray-500">Sponsors added from admin event pages will appear here.</p>}
     </div>
   </div>
 </section>
