@@ -48,7 +48,7 @@ export async function POST(request: Request) {
 
     // Update Database Transaction
     let shouldNotify = false;
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx: any) => {
       const booking = await tx.eventBooking.findUnique({
         where: { id: payload.bookingId },
         include: { ticket: true },
