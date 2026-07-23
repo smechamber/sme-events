@@ -52,7 +52,7 @@ export default async function HomePage() {
       address: featured.location
     },
     image: featured.image,
-    description: featured.shortDescription
+    description: featured.overview?.content ?? featured.overview?.heading ?? featured.name
   };
 
   return (
@@ -60,7 +60,7 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       
       {/* Hero Section */}
-      <Hero events={allEvents} />
+      <Hero />
 
       {/* Upcoming Events */}
   <section className="py-20" id="upcoming">
