@@ -341,13 +341,13 @@ export function EventForm({ event }: { event?: AdminEvent | null }) {
                 <MediaKitForm data={sections.mediaKit} onChange={(d: any) => setSectionData("mediaKit", d)} />
               )}
               {activeTab === "agenda" && (
-                <AgendaForm data={sections.agenda} onChange={(d: any) => setSectionData("agenda", d)} availableSpeakers={sections.speakers || []} />
+                <AgendaForm data={sections.agenda ?? []} onChange={(d: any) => setSectionData("agenda", d)} availableSpeakers={sections.speakers || []} />
               )}
               {activeTab === "speakers" && (
-                <SpeakersForm data={sections.speakers} onChange={(d: any) => setSectionData("speakers", d)} />
+                <SpeakersForm data={sections.speakers ?? []} onChange={(d: any) => setSectionData("speakers", d)} />
               )}
               {activeTab === "sponsors" && (
-                <SponsorsForm data={sections.sponsors} onChange={(d: any) => setSectionData("sponsors", d)} />
+                <SponsorsForm data={sections.sponsors ?? []} onChange={(d: any) => setSectionData("sponsors", d)} />
               )}
               {activeTab === "venue" && (
                 <VenueForm data={sections.venue} onChange={(d: any) => setSectionData("venue", d)} />
@@ -362,8 +362,6 @@ export function EventForm({ event }: { event?: AdminEvent | null }) {
                 <BookForm
                   data={sections.book}
                   onChange={(d: any) => setSectionData("book", d)}
-                  bookingClosesAt={""}
-                  onBookingCloseChange={() => {}}
                   tickets={tickets}
                   onTicketsChange={setTickets}
                 />
