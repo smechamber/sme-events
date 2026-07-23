@@ -66,17 +66,17 @@ export async function PUT(
     
     // Any existing ticket ID that is NOT in the payload is considered deleted
     const ticketsToDelete = existingEvent.tickets.filter(
-      (t) => !incomingTicketIds.includes(t.id)
+      (t: any) => !incomingTicketIds.includes(t.id)
     );
 
     // 3. Safety Check: Prevent deletion of tickets that have bookings
-    const unsafeDeletes = ticketsToDelete.filter(t => t._count.bookings > 0);
+    const unsafeDeletes = ticketsToDelete.filter((t: any) => t._count.bookings > 0);
     if (unsafeDeletes.length > 0) {
-      const unsafeNames = unsafeDeletes.map(t => t.name).join(", ");
+      const unsafeNames = unsafeDeletes.map((t: any) => t.name).join(", ");
       return fail(new Error(`Cannot delete tickets with existing bookings: ${unsafeNames}`), 400, request);
     }
 
-    const idsToDelete = ticketsToDelete.map(t => t.id);
+    const idsToDelete = ticketsToDelete.map((t: any) => t.id);
 
     // 4. Perform the safe update
     const event = await prisma.$transaction(async (tx) => {
