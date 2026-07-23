@@ -1,5 +1,4 @@
 import { prisma } from "@events/db";
-import type { EventTicket } from "@prisma/client";
 import { fail, ok, options } from "../../../../../lib/http";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +9,17 @@ export async function OPTIONS() {
 
 type Params = {
   params: Promise<{ id: string }>;
+};
+
+type PricingTicket = {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  isFree: boolean;
+  requiresApproval: boolean;
+  quantity: number;
+  sold: number;
 };
 
 export async function GET(_: Request, { params }: Params) {
@@ -26,7 +36,7 @@ export async function GET(_: Request, { params }: Params) {
     }
 
     return ok(
-      event.tickets.map((ticket: EventTicket) => ({
+      event.tickets.map((ticket: PricingTicket) => ({
         id: ticket.id,
         name: ticket.name,
         price: ticket.price,
