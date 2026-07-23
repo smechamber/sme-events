@@ -13,6 +13,7 @@
     "@events/db": "*",
     "@events/types": "*",
     "@events/notifications": "*",
+    "@prisma/client": "^6.1.0",
     "cloudinary": "^2.10.0",
     "next": "^15.1.0",
     "react": "^19.0.0",

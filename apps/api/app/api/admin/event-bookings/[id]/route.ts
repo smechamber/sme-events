@@ -1,4 +1,5 @@
 import { prisma } from "@events/db";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { fail, ok, options } from "../../../../../lib/http";
 import { safelyNotifyEventBooking } from "../../../../../lib/event-booking-notifications";
@@ -34,7 +35,7 @@ export async function PATCH(
       return fail(new Error("BOOKING_ALREADY_DECIDED"), 409, request);
     }
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       if (action === "REJECT") {
         return tx.eventBooking.update({
           where: { id },
