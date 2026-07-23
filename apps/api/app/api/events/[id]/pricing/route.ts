@@ -1,4 +1,5 @@
 import { prisma } from "@events/db";
+import type { EventTicket } from "@prisma/client";
 import { fail, ok, options } from "../../../../../lib/http";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +26,7 @@ export async function GET(_: Request, { params }: Params) {
     }
 
     return ok(
-      event.tickets.map((ticket) => ({
+      event.tickets.map((ticket: EventTicket) => ({
         id: ticket.id,
         name: ticket.name,
         price: ticket.price,
@@ -33,7 +34,7 @@ export async function GET(_: Request, { params }: Params) {
         type: ticket.isFree || ticket.price === 0 ? "FREE" : "PAID",
         audience: "ALL",
         currency: "INR",
-        requiresApproval: (ticket as typeof ticket & { requiresApproval?: boolean }).requiresApproval ?? false,
+        requiresApproval: ticket.requiresApproval,
         remaining: Math.max(ticket.quantity - ticket.sold, 0),
       }))
     );
